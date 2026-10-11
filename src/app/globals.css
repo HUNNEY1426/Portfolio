@@ -1,0 +1,1134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Palette
+   The colours are sampled from the two hero plates so the UI and the
+   photography read as one image. Light is warm paper; dark is nebula.
+   Every token flips with the `.dark` class — there are no parallel
+   hard-coded dark values.
+
+   Values are stored as bare RGB channel triplets so Tailwind can apply
+   alpha modifiers (`bg-surface-container-low/70`).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --background: 247 244 241;
+  --foreground: 23 18 26;
+  --surface: 252 250 248;
+  --surface-dim: 228 220 216;
+  --surface-bright: 255 253 251;
+  --surface-container-lowest: 255 255 255;
+  --surface-container-low: 241 236 231;
+  --surface-container: 233 226 222;
+  --surface-container-high: 223 215 211;
+  --surface-container-highest: 213 204 200;
+
+  --on-surface: 23 18 26;
+  --on-surface-variant: 90 82 94;
+  --inverse-surface: 38 32 47;
+  --inverse-on-surface: 242 238 247;
+  --inverse-primary: 185 176 198;
+
+  --outline: 107 100 114;
+  --outline-variant: 213 204 200;
+  --surface-tint: 122 62 157;
+
+  --primary: 11 8 18;
+  --on-primary: 255 255 255;
+  --primary-container: 26 21 36;
+  --on-primary-container: 198 187 212;
+
+  --secondary: 23 18 26;
+  --on-secondary: 255 255 255;
+  --secondary-container: 43 36 56;
+  --on-secondary-container: 247 242 251;
+
+  --tertiary: 122 62 157;
+  --on-tertiary: 255 255 255;
+  --tertiary-container: 239 227 246;
+  --on-tertiary-container: 61 28 83;
+
+  --error: 179 38 30;
+  --on-error: 255 255 255;
+  --error-container: 249 222 220;
+  --on-error-container: 65 14 11;
+
+  --accent: 122 62 157;
+  --hairline-border: 226 218 214;
+  --muted-subtle: 111 104 114;
+  --canvas-white: 255 255 255;
+
+
+  /* Motion */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-instant: 150ms;
+  --duration-fast: 250ms;
+  --duration-base: 400ms;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: 7 5 14;
+  --foreground: 242 238 247;
+  --surface: 13 10 25;
+  --surface-dim: 9 7 18;
+  --surface-bright: 22 17 42;
+  --surface-container-lowest: 5 4 11;
+  --surface-container-low: 17 13 31;
+  --surface-container: 22 17 38;
+  --surface-container-high: 30 24 50;
+  --surface-container-highest: 40 32 64;
+
+  --on-surface: 242 238 247;
+  --on-surface-variant: 167 158 180;
+  --inverse-surface: 242 238 247;
+  --inverse-on-surface: 22 17 38;
+  --inverse-primary: 26 21 36;
+
+  --outline: 139 129 153;
+  --outline-variant: 58 51 80;
+  --surface-tint: 201 160 232;
+
+  --primary: 255 255 255;
+  --on-primary: 11 8 18;
+  --primary-container: 26 21 36;
+  --on-primary-container: 198 187 212;
+
+  --secondary: 242 238 247;
+  --on-secondary: 7 5 14;
+  --secondary-container: 38 32 47;
+  --on-secondary-container: 242 238 247;
+
+  --tertiary: 201 160 232;
+  --on-tertiary: 11 8 18;
+  --tertiary-container: 43 28 60;
+  --on-tertiary-container: 233 215 245;
+
+  --error: 242 184 181;
+  --on-error: 96 20 16;
+  --error-container: 140 29 24;
+  --on-error-container: 249 222 220;
+
+  --accent: 201 160 232;
+  --hairline-border: 36 33 47;
+  --muted-subtle: 139 129 153;
+  --canvas-white: 13 10 25;
+
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    overscroll-behavior: none;
+    background: rgb(var(--background));
+    color: rgb(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Anchored sections must clear the fixed navbar. */
+  section[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  /* A visible, consistent focus ring on every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--on-surface);
+    outline-offset: 3px;
+  }
+}
+
+::selection {
+  background: rgb(var(--primary));
+  color: rgb(var(--on-primary));
+}
+
+/* The custom scrollbar is intentionally hidden — the page is a scroll
+   narrative and the floating controller carries the scroll affordance. */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==========================================================================
+   Page surface and rails
+   Every page is framed by two rails: hatched side margins with a hairline
+   on their inner edge, running the full height of the page. Content lives
+   in the centre column (60% of the width on desktop, 20% per rail).
+   Sections are transparent so the hero sky can run on into the next
+   section and dissolve there; dashed rules divide the sections and cut
+   straight across the rails.
+   ========================================================================== */
+
+:root {
+  --rail: 0.75rem;
+  --rail-line: rgb(var(--on-surface) / 0.14);
+  /* The two vertical lines framing the content column: a touch darker. */
+  --rail-edge: rgb(var(--on-surface) / 0.32);
+  --rail-dot: rgb(var(--on-surface) / 0.22);
+  --section-pad: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --rail: 8vw;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --rail: 20vw;
+  }
+}
+
+.site-shell {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.site-main {
+  position: relative;
+  flex: 1;
+}
+
+/* The rails: a hairline either side of the content column, with a sparse,
+   very faint dot grid in the margin that fades out toward the screen edge.
+   They fade in at the top, so they rise out of the sky. */
+.site-shell::before,
+.site-shell::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+  width: var(--rail);
+  content: "";
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--rail-dot) 0.8px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.site-shell::before {
+  left: 0;
+  border-right: 1px solid var(--rail-edge);
+  background-position: right 11px top 11px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9rem), linear-gradient(to left, #000 0%, transparent 85%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 9rem), linear-gradient(to left, #000 0%, transparent 85%);
+}
+
+.site-shell::after {
+  right: 0;
+  border-left: 1px solid var(--rail-edge);
+  background-position: left 11px top 11px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9rem), linear-gradient(to right, #000 0%, transparent 85%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 9rem), linear-gradient(to right, #000 0%, transparent 85%);
+}
+
+/* Pages that open with a hero keep it full-width: the rails begin below it. */
+.site-shell:has(.hero-section, .page-hero)::before,
+.site-shell:has(.hero-section, .page-hero)::after {
+  top: 100svh;
+}
+
+/* Sections carry no fill of their own: the page colour and the sky show through. */
+.site-main section,
+.site-main [data-editorial-rule],
+.site-main article {
+  background-color: transparent !important;
+}
+
+/* Keep every content block inside the centre column. */
+[data-sections] > section,
+.railed {
+  padding-inline: calc(var(--rail) + var(--section-pad)) !important;
+}
+
+/* Dashed rules between sections, running edge to edge across the rails. */
+[data-sections] > section,
+[data-editorial-rule] {
+  position: relative;
+}
+
+[data-sections] > section::after,
+[data-editorial-rule]::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background-image: repeating-linear-gradient(90deg, var(--rail-line) 0 6px, transparent 6px 12px);
+}
+
+/* A small cross marks each point where a divider meets a rail. */
+[data-sections] > section::before,
+[data-editorial-rule]::before {
+  --plus: rgb(var(--on-surface) / 0.45);
+  position: absolute;
+  right: 0;
+  bottom: -5px;
+  left: 0;
+  z-index: 7;
+  height: 11px;
+  content: "";
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--plus), var(--plus)),
+    linear-gradient(var(--plus), var(--plus)),
+    linear-gradient(var(--plus), var(--plus)),
+    linear-gradient(var(--plus), var(--plus));
+  background-repeat: no-repeat;
+  background-size: 11px 1px, 1px 11px, 11px 1px, 1px 11px;
+  background-position:
+    left calc(var(--rail) - 6px) top 5px,
+    left calc(var(--rail) - 1px) top 0,
+    right calc(var(--rail) - 6px) top 5px,
+    right calc(var(--rail) - 1px) top 0;
+}
+
+/* The sky: sunset in light mode, nebula in dark. */
+.sky {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/sunset.webp");
+  background-size: cover;
+  background-position: var(--sky-focus, center 30%);
+  background-repeat: no-repeat;
+}
+
+.dark .sky {
+  background-image: url("/assets/nebula.webp");
+}
+
+.sky::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+/* Hangs from the top of the hero and dissolves halfway into the next section. */
+.sky--top {
+  top: 0;
+  height: 150svh;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+}
+
+.sky--top::after {
+  background: radial-gradient(55% 32% at 50% 33%, rgb(var(--background) / 0.5) 0%, rgb(var(--background) / 0) 100%);
+}
+
+.dark .sky--top::after {
+  background: radial-gradient(55% 32% at 50% 33%, rgb(var(--background) / 0.35) 0%, rgb(var(--background) / 0) 100%);
+}
+
+/* Rises from the bottom of the footer and dissolves upward. */
+.sky--bottom {
+  bottom: 0;
+  height: 100%;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
+}
+
+.sky--bottom::after {
+  background: linear-gradient(to top, rgb(var(--background) / 0.55) 0%, rgb(var(--background) / 0) 30%);
+}
+
+/* ==========================================================================
+   Interaction primitives
+   ========================================================================== */
+
+@layer components {
+  /* --- Tech stack orbit badges ------------------------------------------ */
+  .orbit-badge {
+    pointer-events: auto;
+    user-select: none;
+  }
+
+  /* --- About statement: keyword spotlight -------------------------------- */
+  /* `!important` is required: Motion writes `opacity` / `filter` / `transform`
+     as inline styles, and inline styles outrank any non-important rule. */
+  .about-container:has(.about-keyword:hover) .about-word {
+    opacity: 0.2 !important;
+    filter: blur(2px) !important;
+    transition: opacity var(--duration-fast) var(--ease-expo),
+      filter var(--duration-fast) var(--ease-expo);
+  }
+
+  .about-container:has(.about-keyword:hover) .about-keyword:hover {
+    opacity: 1 !important;
+    filter: blur(0) !important;
+    transform: translateY(-4px) !important;
+    color: rgb(var(--accent)) !important;
+    transition: transform var(--duration-fast) var(--ease-expo),
+      opacity var(--duration-fast) var(--ease-expo),
+      filter var(--duration-fast) var(--ease-expo),
+      color var(--duration-fast) var(--ease-expo);
+  }
+
+  /* --- Experience cards: dim siblings, focus the hovered card ----------- */
+  .experience-list:has(.experience-card:hover) .experience-card {
+    opacity: 0.3 !important;
+    filter: blur(2.5px) !important;
+    transition: opacity var(--duration-fast) var(--ease-expo),
+      filter var(--duration-fast) var(--ease-expo),
+      transform var(--duration-fast) var(--ease-expo);
+  }
+
+  .experience-list:has(.experience-card:hover) .experience-card:hover {
+    opacity: 1 !important;
+    filter: blur(0) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+    border-color: rgb(var(--primary) / 0.2) !important;
+    box-shadow: 0 4px 20px -2px rgb(0 0 0 / 0.05) !important;
+    transition: opacity var(--duration-fast) var(--ease-expo),
+      filter var(--duration-fast) var(--ease-expo),
+      transform var(--duration-fast) var(--ease-expo);
+  }
+
+  .dark .experience-list:has(.experience-card:hover) .experience-card:hover {
+    border-color: rgb(255 255 255 / 0.25) !important;
+    box-shadow: 0 4px 20px -2px rgb(0 0 0 / 0.5) !important;
+  }
+
+  /* --- Hidden section tags preference ------------------------------------ */
+  [data-show-labels="false"] .section-pill,
+  [data-show-labels="false"] .metadata-label {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: scale(0.92) !important;
+    transition: opacity var(--duration-base) var(--ease-expo),
+      transform var(--duration-base) var(--ease-expo);
+  }
+
+  /* --- Script eyebrow ---------------------------------------------------- */
+  .script-eyebrow {
+    font-family: var(--font-script), cursive;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+  }
+
+  /* --- Display face ------------------------------------------------------ */
+  /* Cormorant Garamond ships old-style figures by default, which turns
+     "100x" into "ıoo". Display text needs lining figures. */
+  .font-display,
+  .font-sans {
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "lnum" 1, "onum" 0;
+  }
+}
+
+/* ==========================================================================
+   Theme switch
+   ========================================================================== */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: var(--ease-expo);
+}
+
+::view-transition-old(root) {
+  animation-name: theme-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: theme-fade-in;
+}
+
+@keyframes theme-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.01);
+  }
+}
+
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fallback colour transition for browsers without View Transitions. */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color var(--duration-base) var(--ease-expo),
+    border-color var(--duration-base) var(--ease-expo),
+    color var(--duration-base) var(--ease-expo),
+    box-shadow var(--duration-base) var(--ease-expo),
+    fill var(--duration-base) var(--ease-expo),
+    stroke var(--duration-base) var(--ease-expo) !important;
+  transition-delay: 0s !important;
+}
+
+/* Images in dark mode lose their multiply blend so they stay vibrant. */
+.dark img[style*="mixBlendMode"],
+.dark .mix-blend-multiply {
+  mix-blend-mode: normal !important;
+}
+
+/* ==========================================================================
+   Reduced motion
+   The product is motion-led, so the preference is honoured aggressively:
+   decorative motion is removed, functional feedback is kept.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Hover-dimming pairs are disorienting when they cannot animate. */
+  .about-container:has(.about-keyword:hover) .about-word,
+  .experience-list:has(.experience-card:hover) .experience-card {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .about-container:has(.about-keyword:hover) .about-keyword:hover,
+  .experience-list:has(.experience-card:hover) .experience-card:hover {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Heroes
+   Full-screen, title centred on the sky. The sky itself lives in `.sky`.
+   -------------------------------------------------------------------------- */
+.hero-section,
+.page-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100svh;
+  padding: 5.5rem clamp(1.25rem, 5vw, 4rem) 5rem;
+  text-align: center;
+}
+
+/* Home: the title sits above centre so the larger portrait has room below. */
+.hero-section {
+  padding-bottom: 34svh;
+}
+
+.hero-intro {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-headline {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  color: rgb(var(--on-surface));
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 30px rgb(var(--background) / 0.35);
+}
+
+.hero-headline em,
+.page-hero-title em {
+  white-space: nowrap;
+  color: rgb(var(--accent));
+  font-style: italic;
+  font-weight: 500;
+}
+
+.reveal-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+.reveal-line-inner {
+  display: inline-block;
+}
+
+/* The portrait rises out of the bottom of the hero and fades into the sky. */
+.hero-portrait-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+}
+
+.hero-portrait {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: auto;
+  height: min(50svh, 34rem);
+  max-width: none;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: translateX(-50%);
+  transition: opacity 650ms var(--ease-editorial), transform 800ms var(--ease-editorial);
+}
+
+.hero-portrait--dark,
+.dark .hero-portrait--light {
+  opacity: 0;
+  transform: translateX(-50%) scale(1.025);
+}
+
+.dark .hero-portrait--dark {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.page-hero > :not(.sky) {
+  position: relative;
+}
+
+.page-hero-eyebrow {
+  display: inline-block;
+  color: rgb(var(--accent));
+  font-family: var(--font-script), cursive;
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  line-height: 1;
+}
+
+.page-hero-title {
+  margin: 0.5rem 0 0;
+  color: rgb(var(--on-surface));
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.6rem, 6.2vw, 5.4rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.page-hero-lede {
+  max-width: 34rem;
+  margin: 1.35rem auto 0;
+  color: rgb(var(--on-surface-variant));
+  font-family: var(--font-body), sans-serif;
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.65;
+}
+
+@media (max-width: 700px) {
+  .hero-headline {
+    font-size: clamp(1.9rem, 8.4vw, 2.6rem);
+  }
+
+  .hero-section {
+    padding-bottom: 40svh;
+  }
+
+  .hero-portrait {
+    height: min(46svh, 28rem);
+  }
+}
+
+/* Theme-aware glass: opacity comes from the active surface tokens. */
+.site-nav,
+.settings-panel,
+.floating-controller-pill,
+.glass-surface,
+.section-pill,
+.experience-card,
+.blog-card,
+main article[class*="rounded-2xl"][class*="bg-surface-container-lowest"],
+main div[class*="rounded-2xl"][class*="bg-surface-container-lowest"] {
+  border-color: rgb(var(--on-surface) / 0.12);
+  background-color: rgb(var(--surface) / 0.58);
+  -webkit-backdrop-filter: blur(22px) saturate(135%);
+  backdrop-filter: blur(22px) saturate(135%);
+  box-shadow: 0 12px 36px rgb(18 13 24 / 0.075), inset 0 1px 0 rgb(255 255 255 / 0.28);
+}
+
+.dark .site-nav,
+.dark .settings-panel,
+.dark .floating-controller-pill,
+.dark .glass-surface,
+.dark .section-pill,
+.dark .experience-card,
+.dark .blog-card,
+.dark main article[class*="rounded-2xl"][class*="bg-surface-container-lowest"],
+.dark main div[class*="rounded-2xl"][class*="bg-surface-container-lowest"] {
+  border-color: rgb(255 255 255 / 0.14);
+  background-color: rgb(var(--surface-container-low) / 0.66);
+  box-shadow: 0 16px 42px rgb(0 0 0 / 0.24), inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.site-nav {
+  border: 1px solid rgb(var(--on-surface) / 0.13);
+  background-color: rgb(var(--background) / 0.26);
+  box-shadow: 0 12px 38px rgb(15 12 22 / 0.1), inset 0 1px 0 rgb(255 255 255 / 0.3);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  backdrop-filter: blur(26px) saturate(150%);
+  transition: background-color 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.dark .site-nav {
+  background-color: rgb(var(--background) / 0.3);
+  box-shadow: 0 14px 42px rgb(0 0 0 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.site-nav--scrolled {
+  background-color: rgb(var(--background) / 0.62);
+  border-color: rgb(var(--on-surface) / 0.17);
+}
+
+.dark .site-nav--scrolled {
+  background-color: rgb(var(--background) / 0.72);
+}
+
+.site-nav-link {
+  color: rgb(var(--on-surface-variant));
+  text-decoration: none;
+}
+
+.site-nav-link:hover,
+.site-nav-link:focus-visible {
+  color: rgb(var(--on-surface));
+  background: rgb(var(--on-surface) / 0.07);
+}
+
+.site-nav-link[aria-current="page"] {
+  color: rgb(var(--on-surface));
+  background: rgb(var(--on-surface) / 0.1);
+}
+
+
+/* Capsule chips keep a soft edge without turning every surface into a card. */
+main [class*="rounded-full"][class*="bg-surface-container-low"] {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(var(--on-surface) / 0.11);
+  background-color: rgb(var(--surface) / 0.48);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  backdrop-filter: blur(14px) saturate(125%);
+}
+
+.experience-card,
+.blog-card,
+.glass-surface,
+main article[class*="rounded-2xl"][class*="bg-surface-container-lowest"],
+main div[class*="rounded-2xl"][class*="bg-surface-container-lowest"] {
+  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.experience-card:hover,
+.blog-card:hover,
+.glass-surface:hover,
+main article[class*="rounded-2xl"][class*="bg-surface-container-lowest"]:hover {
+  border-color: rgb(var(--accent) / 0.32);
+  box-shadow: 0 18px 46px rgb(18 13 24 / 0.11), inset 0 1px 0 rgb(255 255 255 / 0.34);
+}
+
+/* --------------------------------------------------------------------------
+   Footer, the same on every page
+   The handwritten signature over a sky rising from the bottom, then the
+   colophon.
+   -------------------------------------------------------------------------- */
+.site-footer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 82svh;
+  padding: 2.5rem calc(var(--rail) + var(--section-pad)) 1.5rem;
+  color: rgb(var(--on-surface));
+}
+
+.site-footer > :not(.sky) {
+  position: relative;
+}
+
+.finale-signature-wrap {
+  display: grid;
+  flex: 1;
+  place-items: center;
+}
+
+.finale-signature {
+  margin: 0;
+  color: rgb(var(--accent));
+  font-family: var(--font-script), cursive;
+  font-size: clamp(6rem, 17vw, 14rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.finale-ink {
+  display: inline-block;
+  padding-inline: 0.12em;
+}
+
+.finale-footer {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.2rem;
+  color: rgb(var(--on-surface-variant));
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.025em;
+}
+
+.finale-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.footer-coordinate {
+  color: rgb(var(--muted-subtle));
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.finale-footer-nav,
+.finale-footer-socials {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.finale-footer-nav {
+  justify-content: center;
+}
+
+.finale-footer-socials {
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
+.finale-footer-nav a,
+.finale-footer-socials a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.finale-footer-nav a:hover,
+.finale-footer-socials a:hover {
+  color: rgb(var(--accent));
+}
+
+.finale-footer-socials svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+@media (max-width: 700px) {
+  .finale-footer {
+    grid-template-columns: 1fr auto;
+  }
+
+  .finale-footer-nav {
+    order: 3;
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    border-top: 1px dashed var(--rail-line);
+    padding-top: 0.9rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Intro screen
+   The visitor's own time on the page colour, a horizon drawn across the
+   middle, then the two halves part along it.
+   -------------------------------------------------------------------------- */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  user-select: none;
+}
+
+.intro-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50.5%;
+  background: rgb(var(--background));
+}
+
+.intro-half--top {
+  top: 0;
+}
+
+.intro-half--bottom {
+  bottom: 0;
+}
+
+.intro-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.intro-greeting {
+  margin: 0 0 0.6rem;
+  color: rgb(var(--accent));
+  font-family: var(--font-script), cursive;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1;
+}
+
+.intro-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.intro-time,
+.intro-date {
+  display: inline-block;
+  color: rgb(var(--on-surface));
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.intro-time {
+  font-size: clamp(3rem, 9vw, 7.5rem);
+}
+
+.intro-date {
+  margin-top: 0.35rem;
+  color: rgb(var(--on-surface-variant));
+  font-size: clamp(1.3rem, 3vw, 2.4rem);
+  letter-spacing: 0.04em;
+}
+
+.intro-horizon {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--accent)) 30%, rgb(var(--accent)) 70%, transparent);
+  transform-origin: center;
+}
+
+.intro-footnote {
+  position: absolute;
+  right: 0;
+  bottom: 1.6rem;
+  left: 0;
+  margin: 0;
+  color: rgb(var(--muted-subtle));
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.intro-footnote span {
+  color: rgb(var(--accent));
+}
+
+/* Contribution graph: one column per week, fewer weeks on phones. */
+.graph-grid {
+  display: grid;
+  grid-template-columns: var(--graph-cols-phone);
+}
+
+@media (min-width: 640px) {
+  .graph-grid {
+    grid-template-columns: var(--graph-cols);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Tech stack bands
+   Three rows of bordered tiles, edge to edge, scrolling forever in
+   alternating directions. Logos are grey until hovered.
+   -------------------------------------------------------------------------- */
+.tech-bands {
+  --tile: 104px;
+  border-top: 1px solid var(--rail-line);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.tech-band {
+  overflow: hidden;
+  border-bottom: 1px solid var(--rail-line);
+}
+
+.tech-track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: tech-scroll 45s linear infinite;
+}
+
+.tech-track--reverse {
+  animation-direction: reverse;
+}
+
+/* Pause the band under the pointer, so a logo can be read and hovered. */
+.tech-band:hover .tech-track {
+  animation-play-state: paused;
+}
+
+@keyframes tech-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tech-tile {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tile);
+  height: var(--tile);
+  border-right: 1px solid var(--rail-line);
+  color: rgb(var(--on-surface));
+  transition: background-color 250ms ease;
+}
+
+.tech-tile svg {
+  width: 34%;
+  height: 34%;
+  filter: grayscale(1);
+  opacity: 0.45;
+  transition: filter 300ms var(--ease-expo), opacity 300ms var(--ease-expo), transform 300ms var(--ease-expo);
+}
+
+.tech-tile-name {
+  position: absolute;
+  right: 0;
+  bottom: 0.55rem;
+  left: 0;
+  color: rgb(var(--muted-subtle));
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-inline: 0.35rem;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 250ms ease, transform 250ms var(--ease-expo);
+}
+
+.tech-tile:hover {
+  background-color: rgb(var(--on-surface) / 0.04);
+}
+
+.tech-tile:hover svg {
+  filter: none;
+  opacity: 1;
+  transform: translateY(-5px) scale(1.06);
+}
+
+.tech-tile:hover .tech-tile-name {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .tech-bands {
+    --tile: 80px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tech-track {
+    animation: none;
+  }
+}
+
+/* Footer links get a taller tap target on touch screens. */
+.finale-footer-nav a,
+.finale-footer-socials a {
+  padding-block: 0.4rem;
+}
